@@ -43,8 +43,12 @@ contract MyEpicNFT is ERC721URIStorage {
         "Espirituoso",
         "Agradavel"
     ];
+      // Cores divertidas! Declarando um monte de cores
+    string[] colors = ["red", "#08C2A8", "black", "yellow", "blue", "green"];
 
-  constructor() ERC721 ("ChavesNFT", "CHAVO") {
+    event NewEpicNFTMinted(address sender, uint256 tokenId);
+
+  constructor() ERC721 ("AdaNFT", "AdaLovegrace") {
     console.log("Meu contrato de NFT! Tchu-hu");
   }
 
@@ -69,22 +73,32 @@ contract MyEpicNFT is ERC721URIStorage {
     return thirdWords[rand];
   }
 
+   // Mesma coisa de sempre, pega uma cor aleatória.
+  function pickRandomColor(uint256 tokenId) public view returns (string memory) {
+    uint256 rand = random(string(abi.encodePacked("COLOR", Strings.toString(tokenId))));
+    rand = rand % colors.length;
+    return colors[rand];
+    
+  }
+
   function random(string memory input) internal pure returns (uint256) {
       return uint256(keccak256(abi.encodePacked(input)));
   }
 
   function makeAnEpicNFT() public {
     uint256 newItemId = _tokenIds.current();
+    emit NewEpicNFTMinted(msg.sender, newItemId);
 
     // Agora pegamos uma palavra aleatoria de cada uma das 3 listas.
     string memory first = pickRandomFirstWord(newItemId);
     string memory second = pickRandomSecondWord(newItemId);
     string memory third = pickRandomThirdWord(newItemId);
     string memory combinedWord = string(abi.encodePacked(first, second, third));
-
+     
+  string memory randomColor = pickRandomColor(newItemId);       
     // Concateno tudo junto e fecho as tags <text> e <svg>.
     string memory finalSvg = string(abi.encodePacked(baseSvg, combinedWord, "</text></svg>"));
-
+    
     // pego todos os metadados de JSON e codifico com base64.
     string memory json = Base64.encode(
         bytes(
@@ -114,7 +128,7 @@ contract MyEpicNFT is ERC721URIStorage {
     _safeMint(msg.sender, newItemId);
     
     // AQUI VAI A NOVA URI DINAMICAMENTE GERADA!!!
-    _setTokenURI(newItemId, finalTokenUri);
+    _setTokenURI(newItemId, "https://www.jsonkeeper.com/b/UJU5");
   
     _tokenIds.increment();
     console.log("Um NFT com ID %s foi cunhado para %s", newItemId, msg.sender);
